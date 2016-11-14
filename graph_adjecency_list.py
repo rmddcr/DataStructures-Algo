@@ -90,7 +90,86 @@ class graph:
             print(st)
             self.print_graph(current.next)
 
-    def BFS():
+    def make_path(self,current,path=-1):
+        if path == -1:
+            path = [current]
+        if not current is None:
+            path.append(path[-1].prev)
+            return self.make_path(path[-1],path)
+        else:
+            path.pop(-1)
+            path.reverse()
+            return path
+
+    def BFT(self,start,end,queue=None,time=0):
+        if queue is None:
+            #print
+            print("#### BFT ####")
+            print("")
+            #print
+            start_vertex = self.search_vertex(start)
+            if start_vertex is None:
+                return None
+            else:
+                start_vertex.traversed = True
+                start_vertex.in_time = time
+                queue = [start_vertex]
+
+        if not queue == []:
+            current = queue.pop(0)
+            current.time = time
+            #print
+            print "level :" + str(time) + " ,Vertex :" + str(current.index)
+            #print
+            if current.index == end:
+                current.traversed = True
+                print("#### END OF BFT ####")
+                return self.make_path(current)
+            else:
+                #print
+                st="---> out : "
+                #print
+                for e in current.adj:
+                    a = e._in
+                    #print
+                    st+= str(a.index) + ", "
+                    #print
+                    if not a.traversed:
+                        a.traversed = True
+                        a.prev = current
+                        queue.append(a)
+                print(st)
+                print("---------------------------")
+                return self.BFT(start,end,queue,time+1)
+
+        else:
+            return None
+
+    def clear_all(self,current=-1):
+        if current == -1:
+            current = self.top
+        current.traversed = False
+        current.prev = None
+        current.in_time = -1
+        current.out_time = -1
+
+    def print_path(self,path):
+        st = "["
+        for v in path:
+            st += str(v.index) + ", "
+        st += "]"
+        print(st)
+
+    def search_path(self,start,end):
+        self.clear_all()
+        if not self.weighted:
+            path = self.BFT(start,end)
+        else:
+            path = self.BFT(start,end)
+
+        if not path is None:
+            self.print_path(path)
+        return path
 
 
 g= graph(True,True)
@@ -106,4 +185,7 @@ g.add_edge('B','C',4)
 g.add_edge('C','D',2)
 g.add_edge('A','E',6)
 g.add_edge('B','F',1)
+
 g.print_graph()
+
+g.search_path('A','D')
